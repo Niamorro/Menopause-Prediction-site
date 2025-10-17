@@ -1,0 +1,6 @@
+streamlit
+lifelines
+pandas
+numpy
+joblib
+requests
