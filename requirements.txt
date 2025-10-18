@@ -1,6 +1,8 @@
 streamlit
-lifelines
 pandas
 numpy
+scipy
 joblib
-requests
+matplotlib
+lifelines
+scikit-learn
