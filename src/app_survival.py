@@ -159,6 +159,29 @@ try:
     ax.set_ylim(0,1); ax.grid(True, alpha=0.3)
     st.pyplot(fig)
 
+    # Factor contributions (log-hazard)
+    if st.checkbox("Show factor contributions (log-hazard)"):
+        try:
+            coefs = getattr(cph, "params_", None)
+            if coefs is None:
+                st.info("Model coefficients are not available; cannot compute contributions.")
+            else:
+                coefs = coefs.reindex(features)  # привести порядок к features
+                xv = X.iloc[0].reindex(features).astype(float)
+                contrib = coefs.values * xv.values
+                contrib_df = pd.DataFrame({
+                    "feature": features,
+                    "coef": coefs.values,
+                    "value": xv.values,
+                    "contribution": contrib
+                })
+                # убрать NaN/Inf и отсортировать по величине вклада
+                contrib_df = contrib_df.replace([np.inf, -np.inf], np.nan).dropna(subset=["contribution"])
+                contrib_df = contrib_df.sort_values("contribution", key=lambda s: s.abs(), ascending=False)
+                st.write(contrib_df.head(8))
+        except Exception as e:
+            st.warning(f"Could not compute factor contributions: {e}")
+
     if st.checkbox("Download JSON report"):
         report = {
             "inputs": {"age":age_c, "bmi":bmi_c, "FSH":fsh_c, "E2":e2_c, "baseline_status":status_choice},
